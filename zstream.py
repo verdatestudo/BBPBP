@@ -57,7 +57,17 @@ def run_main_app():
     return None
 
 
-credentials = st.secrets["credentials"]
+# credentials = st.secrets["credentials"]
+
+users_list = st.secrets["credentials"]["users"]
+
+credentials = {"usernames": {}}
+for user in users_list:
+    credentials["usernames"][user["username"]] = {
+        "name": user["name"],
+        "password": user["password"],
+    }
+
 
 authenticator = stauth.Authenticate(
     credentials,
