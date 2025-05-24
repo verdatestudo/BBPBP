@@ -58,7 +58,9 @@ def clean_df_lineup(df_lineup):
 
 def convert_all_plays(df, player_name_pattern):
     df['PLAY_REGEX'] = df['EVENT'].apply(lambda row: convert_play_to_regex(row, player_name_pattern))
-    df['PLAY_REGEX'].to_clipboard(sep=',', index=False)
+
+    # Don't use in app as gives pyperclip error.
+    # df['PLAY_REGEX'].to_clipboard(sep=',', index=False)
     return df
 
 def convert_play_to_regex(play, pattern):
