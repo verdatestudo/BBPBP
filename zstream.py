@@ -76,7 +76,8 @@ if authentication_status:
     run_main_app()
 elif authentication_status is False:
     st.error("Username/password is incorrect")
-elif authentication_status is None:
+else:
+# elif authentication_status is None:
     st.warning("Please enter your username and password")
 
 
