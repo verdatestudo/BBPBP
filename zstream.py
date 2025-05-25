@@ -129,8 +129,8 @@ def supabase():
 
                 # Check for errors on insert
                 # The execute() returns a PostgrestResponse; check status_code
-                if insert_resp.status_code >= 400:
-                    st.warning(f"Warning: Could not log login time: {insert_resp.data}")
+                if insert_resp.error:
+                    st.warning(f"Warning: Could not log login time: {insert_resp.error.message}")
 
                 st.success("You have successfully logged in!")
                 st.session_state["user"] = user
