@@ -32,24 +32,25 @@ def tidy_data(df):
 
     return df
 
-def save_xls(dfs, path):
-    """
-    Save a dictionary of dataframes to an excel file, 
-    with each dataframe as a separate page
-    """
-    # writer = pd.ExcelWriter(path)
+# def save_xls(dfs, path):
+#     """
+#     Save a dictionary of dataframes to an excel file, 
+#     with each dataframe as a separate page
+#     """
+#     # writer = pd.ExcelWriter(path)
     
-#     for opponent in dfs.keys():
-# #         dfs[opponent]['lineup'].to_excel(writer, sheet_name=f'{opponent}_lineup')
-#         dfs[opponent]['plays'].to_excel(writer, sheet_name=f'{opponent}_plays')
+# #     for opponent in dfs.keys():
+# # #         dfs[opponent]['lineup'].to_excel(writer, sheet_name=f'{opponent}_lineup')
+# #         dfs[opponent]['plays'].to_excel(writer, sheet_name=f'{opponent}_plays')
 
-    # removing writer.save
-    with pd.ExcelWriter(path, engine='openpyxl') as writer:
-        for opponent in dfs.keys():
-            dfs[opponent]['plays'].to_excel(writer, sheet_name=f'{opponent}_plays')
+#     # removing writer.save
+#     dfs[0].to_csv(path)
+#     # with pd.ExcelWriter(path, engine='openpyxl') as writer:
+#     #     for opponent in dfs.keys():
+#     #         dfs[opponent]['plays'].to_excel(writer, sheet_name=f'{opponent}_plays')
 
-    # writer.save()
-    return None
+#     # writer.save()
+#     return None
 
 
 def do_stage_two(input_path, output_path):
@@ -57,34 +58,19 @@ def do_stage_two(input_path, output_path):
 
     # https://stackoverflow.com/questions/26521266/using-pandas-to-pd-read-excel-for-multiple-worksheets-of-the-same-workbook
 
-    xls = pd.ExcelFile(input_path)
-
-    dfs = {}
-
-    for sheet in xls.sheet_names:
-        opponent, sheet_type = sheet.split('_')
-        df = pd.read_excel(input_path, sheet_name=sheet)
-        
-        # can also use this as a sanity check if we have two files vs same opponent, ensure we're not overwriting.
-        if opponent not in dfs:
-            dfs[opponent] = {}
-        
-        dfs[opponent][sheet_type] = df
-
+    df = pd.read_csv(input_path)
     df_plays_all = get_all_regex_plays(plays_filename)
 
-    for opponent in dfs:
-        df_game_2 = dfs[opponent]['plays']
-        df_game_2 = pd.merge(df_game_2, df_plays_all, on='PLAY_REGEX', how='left')
-        df_game_2 = switch_shot_players(df_game_2)
-        df_game_2 = tidy_data(df_game_2)
-        dfs[opponent]['plays'] = df_game_2
+    df_game_2 = pd.merge(df, df_plays_all, on='PLAY_REGEX', how='left')
+    df_game_2 = switch_shot_players(df_game_2)
+    df_game_2 = tidy_data(df_game_2)
 
     # save_filename_regex = f'game_data_3reports/{fname}'
-    save_xls(dfs, output_path)
+    df_game_2.to_csv(output_path)
+
 
 if __name__ == '__main__':
-    fname = 'zstreamtest.xlsx'
+    fname = 'zstreamtest.csv'
     open_filename = f'game_data_2converted/{fname}'
     save_filename = f'game_data_3reports/{fname}'
     pass

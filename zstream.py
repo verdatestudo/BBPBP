@@ -17,17 +17,17 @@ def run_main_app():
         st.rerun()
 
     with st.container():
-        uploaded_file = st.file_uploader("Upload your spreadsheet", type=["xlsx", "csv"])
+        uploaded_file = st.file_uploader("Upload your spreadsheet", type=["csv"])
 
         if uploaded_file is not None:
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as temp_input:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as temp_input:
                 temp_input.write(uploaded_file.read())
                 input_path = temp_input.name
 
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as temp_stage1:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as temp_stage1:
                 output_path_stage1 = temp_stage1.name
 
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as temp_stage2:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as temp_stage2:
                 output_path_stage2 = temp_stage2.name
 
             generate_report(input_path, output_path_stage1, output_path_stage2)
@@ -36,19 +36,16 @@ def run_main_app():
                 st.download_button(
                     label="Download Final Report",
                     data=f,
-                    file_name="final_report.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    file_name="final_report.csv",
+                    mime="text/csv"
                 )
 
     st.header("How To")
     st.markdown("* In BB Preferences, change language to English (UK).")
-    st.markdown("* Download your play-by-play to an excel file. See below if you require more detail.")
-    st.markdown("* You can upload multiple games at once using the same spreadsheet. Just put each play-by-play data in a different worksheet and give each worksheet a specific name.")
+    st.markdown("* Download your play-by-play to a spreadsheet. SAVE AS CSV. See below if you require more detail.")
     st.markdown("* Upload here and run this app.")
-    st.markdown("* Download the completed spreadsheet.")
-    st.markdown("* On google sheets, duplicate a current report and rename it.")
-    st.markdown("* Copy and paste the data from this app spreadsheet, into the google sheets spreadsheet.")
-    st.markdown("* You should now be able to use the pivot tables and other reports.")
+    st.markdown("* Download the completed csv file.")
+    st.markdown("* You should now be able to use this to create pivot tables and analyse the data.")
 
     st.header("Downloading Play-By-Play")
     st.markdown("* Go to the bottom of the PBP.")
@@ -57,7 +54,7 @@ def run_main_app():
     st.image("zstream_example.png")
 
     st.header("More")
-    st.markdown("* There will be the occasional shot missing. For example if a team shot 40/89 FG, you might see 40/87 or 39/88 or something. This will be because I haven't seen a specific play before and haven't charted it. Let me know and I can add it.")
+    st.markdown("* There will be the occasional shot missing. For example if a team shot 40/89 FG, you might only see something like 39/87. This will be because I haven't seen a specific play before and haven't charted it. Let me know and I can add it.")
 
     return None
 
