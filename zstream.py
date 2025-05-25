@@ -408,17 +408,89 @@ def run_main_app():
 
 #     return False
 
+# def supabase():
+#     if "user" in st.session_state:
+#         st.success("Already logged in!")
+#         return True
+
+#     SUPABASE_URL = st.secrets["SUPABASE_URL"]
+#     SUPABASE_KEY = st.secrets["SUPABASE_KEY"]  # anon key
+#     SUPABASE_SERVICE_KEY = st.secrets["SUPABASE_SERVICE_KEY"]  # service role key
+
+#     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+#     service_supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+#     st.title("Secure Login")
+
+#     email = st.text_input("Enter your email address", key="email_input")
+
+#     if st.button("Send OTP"):
+#         if email:
+#             try:
+#                 response = supabase.auth.sign_in_with_otp({"email": email})
+#                 st.success("An OTP has been sent to your email.")
+#             except Exception as e:
+#                 st.error(f"Error sending OTP: {e}")
+
+#     otp = st.text_input("Enter the OTP code", key="otp_input")
+
+#     if st.button("Verify OTP"):
+#         if email and otp:
+#             try:
+#                 response = supabase.auth.verify_otp({
+#                     "email": email,
+#                     "token": otp,
+#                     "type": "email"
+#                 })
+
+#                 # Access session and user directly (no .get())
+#                 session = response.session
+#                 user = response.user
+
+#                 if not session or not user:
+#                     st.error("OTP verification failed: no session or user returned.")
+#                     return False
+
+#                 user_email = user.email
+
+#                 allowed_emails = st.secrets.get("allowed_emails", [])
+#                 if user_email not in allowed_emails:
+#                     st.error("You are not authorized to use this app.")
+#                     return False
+
+#                 # Insert login record using service client to bypass RLS
+#                 insert_response = service_supabase.table("logins").insert({
+#                     "email": user_email,
+#                     "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
+#                 }).execute()
+
+#                 if insert_response.error:
+#                     st.warning(f"Warning: Could not log login time: {insert_response.error.message}")
+
+#                 st.success("You have successfully logged in!")
+#                 st.session_state["user"] = user
+
+#                 return True
+
+#             except Exception as e:
+#                 st.error(f"Error verifying OTP: {e}")
+
+#     return False
+
 def supabase():
+    # If already logged in, show success and proceed
     if "user" in st.session_state:
         st.success("Already logged in!")
         return True
 
+    # Get secrets
     SUPABASE_URL = st.secrets["SUPABASE_URL"]
     SUPABASE_KEY = st.secrets["SUPABASE_KEY"]  # anon key
     SUPABASE_SERVICE_KEY = st.secrets["SUPABASE_SERVICE_KEY"]  # service role key
 
-    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    service_supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+    # Create clients
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    service_supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
     st.title("Secure Login")
 
@@ -443,12 +515,12 @@ def supabase():
                     "type": "email"
                 })
 
-                # Access session and user directly (no .get())
-                session = response.session
+                # The response is an AuthResponse object with attributes .user and .session
                 user = response.user
+                session = response.session
 
-                if not session or not user:
-                    st.error("OTP verification failed: no session or user returned.")
+                if not user or not session:
+                    st.error("OTP verification failed: no user or session returned.")
                     return False
 
                 user_email = user.email
@@ -458,14 +530,14 @@ def supabase():
                     st.error("You are not authorized to use this app.")
                     return False
 
-                # Insert login record using service client to bypass RLS
+                # Log login using service client (bypass RLS)
                 insert_response = service_supabase.table("logins").insert({
                     "email": user_email,
                     "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
                 }).execute()
 
-                if insert_response.error:
-                    st.warning(f"Warning: Could not log login time: {insert_response.error.message}")
+                if insert_response.status_code >= 400:
+                    st.warning(f"Warning: Could not log login time: {insert_response.data}")
 
                 st.success("You have successfully logged in!")
                 st.session_state["user"] = user
@@ -476,8 +548,6 @@ def supabase():
                 st.error(f"Error verifying OTP: {e}")
 
     return False
-
-
 
 
 
