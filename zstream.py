@@ -241,7 +241,7 @@ def supabase():
                     return False
 
                 # Set the session so Supabase SDK knows who is logged in
-                supabase.auth.set_session(session)
+                supabase.auth.set_session(session.access_token, session.refresh_token)
 
                 # Insert login record (RLS should allow this now)
                 supabase.table("logins").insert({
