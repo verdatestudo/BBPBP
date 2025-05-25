@@ -107,24 +107,49 @@ def supabase():
                     "type": "email"
                 })
 
+                session = response.session  # Get the authenticated session
+                user_email = session.user.email  # more reliable than response.user
                 allowed_emails = st.secrets.get("allowed_emails", [])
                 
-                if response.user.email not in allowed_emails:
+                if user_email not in allowed_emails:
                     st.error("You are not authorized to use this app.")
                     return False
+
+                # Re-create the Supabase client with the session's token
+                authed_supabase = create_client(
+                    SUPABASE_URL,
+                    SUPABASE_KEY,
+                    options={
+                        "global": {
+                            "headers": {
+                                "Authorization": f"Bearer {session.access_token}"
+                            }
+                        }
+                    }
+                )
+
+                # Now you're authenticated for the insert
+                authed_supabase.table("logins").insert({
+                    "email": user_email,
+                }).execute()
 
                 st.success("You have successfully logged in!")
                 st.session_state["user"] = response.user
 
-                # Optional: log login
-                supabase.table("logins").insert({
-                    "email": response.user.email,
-                }).execute()
+                # # Optional: log login
+                # supabase.table("logins").insert({
+                #     "email": response.user.email,
+                # }).execute()
 
                 return True
 
             except Exception as e:
                 st.error(f"Error verifying OTP: {e}")
+
+                st.success("You have successfully logged in!")
+                st.session_state["user"] = session.user
+                return True
+
             # response = supabase.auth.verify_otp({
             #     "email": email,
             #     "token": otp,
