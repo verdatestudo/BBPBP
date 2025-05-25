@@ -246,7 +246,7 @@ def supabase():
                 # Insert login record (RLS should allow this now)
                 supabase.table("logins").insert({
                     "email": user_email,
-                    "login_time": datetime.datetime.utcnow().isoformat()
+                    "timestamp": datetime.datetime.utcnow().isoformat()
                 }).execute()
 
                 st.success("You have successfully logged in!")
