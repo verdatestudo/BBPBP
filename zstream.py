@@ -17,7 +17,7 @@ def run_main_app():
         st.rerun()
 
     with st.container():
-        uploaded_file = st.file_uploader("Upload your spreadsheet", type=["csv"])
+        uploaded_file = st.file_uploader("Upload your csv file", type=["csv"])
 
         if uploaded_file is not None:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as temp_input:

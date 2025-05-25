@@ -32,27 +32,6 @@ def tidy_data(df):
 
     return df
 
-# def save_xls(dfs, path):
-#     """
-#     Save a dictionary of dataframes to an excel file, 
-#     with each dataframe as a separate page
-#     """
-#     # writer = pd.ExcelWriter(path)
-    
-# #     for opponent in dfs.keys():
-# # #         dfs[opponent]['lineup'].to_excel(writer, sheet_name=f'{opponent}_lineup')
-# #         dfs[opponent]['plays'].to_excel(writer, sheet_name=f'{opponent}_plays')
-
-#     # removing writer.save
-#     dfs[0].to_csv(path)
-#     # with pd.ExcelWriter(path, engine='openpyxl') as writer:
-#     #     for opponent in dfs.keys():
-#     #         dfs[opponent]['plays'].to_excel(writer, sheet_name=f'{opponent}_plays')
-
-#     # writer.save()
-#     return None
-
-
 def do_stage_two(input_path, output_path):
     plays_filename = 'pbp_regex.xlsx'
 
