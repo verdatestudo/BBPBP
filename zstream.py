@@ -120,23 +120,25 @@ def supabase():
                     st.error("You are not authorized to use this app.")
                     return False
 
-                # Re-create the Supabase client with the session's token
-                authed_supabase = create_client(
-                    SUPABASE_URL,
-                    SUPABASE_KEY,
-                    options={
-                        "global": {
-                            "headers": {
-                                "Authorization": f"Bearer {session.access_token}"
-                            }
-                        }
-                    }
-                )
+                # # Re-create the Supabase client with the session's token
+                # authed_supabase = create_client(
+                #     SUPABASE_URL,
+                #     SUPABASE_KEY,
+                #     options={
+                #         "global": {
+                #             "headers": {
+                #                 "Authorization": f"Bearer {session.access_token}"
+                #             }
+                #         }
+                #     }
+                # )
 
                 # Now you're authenticated for the insert
                 authed_supabase.table("logins").insert({
                     "email": user_email,
                 }).execute()
+
+                
 
                 st.success("You have successfully logged in!")
                 st.session_state["user"] = response.user
