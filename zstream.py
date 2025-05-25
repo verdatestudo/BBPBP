@@ -536,8 +536,8 @@ def supabase():
                     "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
                 }).execute()
 
-                if insert_response.status_code >= 400:
-                    st.warning(f"Warning: Could not log login time: {insert_response.data}")
+                if insert_response.error:
+                    st.warning(f"Warning: Could not log login time: {insert_response.error.message}")
 
                 st.success("You have successfully logged in!")
                 st.session_state["user"] = user
