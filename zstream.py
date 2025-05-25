@@ -107,6 +107,11 @@ def supabase():
                     "type": "email"
                 })
 
+                # Check if session exists in response
+                if not response.session:
+                    st.error("OTP verification failed: no session returned.")
+                    return False
+
                 session = response.session  # Get the authenticated session
                 user_email = session.user.email  # more reliable than response.user
                 allowed_emails = st.secrets.get("allowed_emails", [])
