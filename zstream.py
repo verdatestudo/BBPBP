@@ -14,6 +14,7 @@ def run_main_app():
     st.header("How To")
     st.markdown("* In BB Preferences, change language to English (UK).")
     st.markdown("* Download your play-by-play to an excel file. See below if you require more detail.")
+    st.markdown("* You can upload multiple games at once using the same spreadsheet. Just put each play-by-play data in a different worksheet and give each worksheet a specific name.")
     st.markdown("* Upload here and run this app.")
     st.markdown("* Download the completed spreadsheet.")
     st.markdown("* On google sheets, duplicate a current report and rename it.")
@@ -57,17 +58,7 @@ def run_main_app():
     return None
 
 
-# credentials = st.secrets["credentials"]
-
-users_list = st.secrets["credentials"]["users"]
-
-credentials = {"usernames": {}}
-for user in users_list:
-    credentials["usernames"][user["username"]] = {
-        "name": user["name"],
-        "password": user["password"],
-    }
-
+credentials = st.secrets["credentials"]
 
 authenticator = stauth.Authenticate(
     credentials,
