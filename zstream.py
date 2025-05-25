@@ -58,28 +58,30 @@ def run_main_app():
     return None
 
 
-credentials = st.secrets["credentials"]
+run_main_app()
 
-authenticator = stauth.Authenticate(
-    credentials,
-    st.secrets["cookie_name"],
-    st.secrets["signature_key"],
-    cookie_expiry_days=1,
-    preauthorized=[]
-)
+# credentials = st.secrets["credentials"]
 
-st.title("BB PBP Analyser")
+# authenticator = stauth.Authenticate(
+#     credentials,
+#     st.secrets["cookie_name"],
+#     st.secrets["signature_key"],
+#     cookie_expiry_days=1,
+#     preauthorized=[]
+# )
 
-name, authentication_status, username = authenticator.login("Login", "main")
+# st.title("BB PBP Analyser")
 
-if authentication_status:
-    st.write(f"Welcome {name}")
-    run_main_app()
-elif authentication_status is False:
-    st.error("Username/password is incorrect")
-else:
-# elif authentication_status is None:
-    st.warning("Please enter your username and password")
+# name, authentication_status, username = authenticator.login("Login", "main")
+
+# if authentication_status:
+#     st.write(f"Welcome {name}")
+#     run_main_app()
+# elif authentication_status is False:
+#     st.error("Username/password is incorrect")
+# else:
+# # elif authentication_status is None:
+#     st.warning("Please enter your username and password")
 
 
 
