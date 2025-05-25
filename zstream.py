@@ -82,39 +82,72 @@ def supabase():
 
     if st.button("Send OTP"):
         if email:
-            response = supabase.auth.sign_in_with_otp({"email": email})
-            if response.error:
-                st.error(f"Error sending OTP: {response.error.message}")
-            else:
+            try:
+                response = supabase.auth.sign_in_with_otp({"email": email})
                 st.success("An OTP has been sent to your email.")
+            except Exception as e:
+                st.error(f"Error sending OTP: {e}")
+
+            # response = supabase.auth.sign_in_with_otp({"email": email})
+            # if response.error:
+            #     st.error(f"Error sending OTP: {response.error.message}")
+            # else:
+            #     st.success("An OTP has been sent to your email.")
+
+
 
     otp = st.text_input("Enter the OTP code", key="otp_input")
 
     if st.button("Verify OTP"):
         if email and otp:
-            response = supabase.auth.verify_otp({
-                "email": email,
-                "token": otp,
-                "type": "email"
-            })
-            
-            if response.error:
-                st.error(f"Error verifying OTP: {response.error.message}")
-            else:
-                # Check if email is in allowed list
+            try:
+                response = supabase.auth.verify_otp({
+                    "email": email,
+                    "token": otp,
+                    "type": "email"
+                })
+
                 allowed_emails = st.secrets.get("allowed_emails", [])
-                if response.user.email not in allowed_emails:
-                    st.error("Access denied: You are not authorized to use this app.")
-                    return False
                 
-                # Log login
+                if response.user.email not in allowed_emails:
+                    st.error("You are not authorized to use this app.")
+                    return False
+
+                st.success("You have successfully logged in!")
+                st.session_state["user"] = response.user
+
+                # Optional: log login
                 supabase.table("logins").insert({
                     "email": response.user.email,
                 }).execute()
 
-                st.success("You have successfully logged in!")
-                st.session_state["user"] = response.user
                 return True
+
+            except Exception as e:
+                st.error(f"Error verifying OTP: {e}")
+            # response = supabase.auth.verify_otp({
+            #     "email": email,
+            #     "token": otp,
+            #     "type": "email"
+            # })
+
+            # if response.error:
+            #     st.error(f"Error verifying OTP: {response.error.message}")
+            # else:
+            #     # Check if email is in allowed list
+            #     allowed_emails = st.secrets.get("allowed_emails", [])
+            #     if response.user.email not in allowed_emails:
+            #         st.error("Access denied: You are not authorized to use this app.")
+            #         return False
+                
+            #     # Log login
+            #     supabase.table("logins").insert({
+            #         "email": response.user.email,
+            #     }).execute()
+
+            #     st.success("You have successfully logged in!")
+            #     st.session_state["user"] = response.user
+            #     return True
     
     return False
 
