@@ -14,7 +14,7 @@ def run_main_app():
     if st.button("Logout"):
         st.session_state.clear()
         st.rerun()
-        
+
     uploaded_file = st.file_uploader("Upload your spreadsheet", type=["xlsx", "csv"])
 
     st.header("How To")
@@ -82,7 +82,7 @@ def supabase():
 
     if st.button("Send OTP"):
         if email:
-            response = supabase.auth.sign_in_with_otp(email=email)
+            response = supabase.auth.sign_in_with_otp({"email": email})
             if response.error:
                 st.error(f"Error sending OTP: {response.error.message}")
             else:
@@ -92,7 +92,12 @@ def supabase():
 
     if st.button("Verify OTP"):
         if email and otp:
-            response = supabase.auth.verify_otp(email=email, token=otp, type='email')
+            response = supabase.auth.verify_otp({
+                "email": email,
+                "token": otp,
+                "type": "email"
+            })
+            
             if response.error:
                 st.error(f"Error verifying OTP: {response.error.message}")
             else:
