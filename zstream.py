@@ -6,9 +6,15 @@ import streamlit as st
 import streamlit_authenticator as stauth
 import pandas as pd
 import tempfile
+
+from supabase import create_client, Client
 from zpbp_stage_one import generate_report
 
 def run_main_app():
+    if st.button("Logout"):
+        st.session_state.clear()
+        st.rerun()
+        
     uploaded_file = st.file_uploader("Upload your spreadsheet", type=["xlsx", "csv"])
 
     st.header("How To")
@@ -58,7 +64,58 @@ def run_main_app():
     return None
 
 
-run_main_app()
+def supabase():
+    # Check if user is already logged in
+    if "user" in st.session_state:
+        st.success("Already logged in!")
+        return True
+    
+    # Replace with your actual Supabase project URL and anon key
+    SUPABASE_URL = st.secrets["SUPABASE_URL"]
+    SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+    st.title("Secure Login")
+
+    email = st.text_input("Enter your email address", key="email_input")
+
+    if st.button("Send OTP"):
+        if email:
+            response = supabase.auth.sign_in_with_otp(email=email)
+            if response.error:
+                st.error(f"Error sending OTP: {response.error.message}")
+            else:
+                st.success("An OTP has been sent to your email.")
+
+    otp = st.text_input("Enter the OTP code", key="otp_input")
+
+    if st.button("Verify OTP"):
+        if email and otp:
+            response = supabase.auth.verify_otp(email=email, token=otp, type='email')
+            if response.error:
+                st.error(f"Error verifying OTP: {response.error.message}")
+            else:
+                # Check if email is in allowed list
+                allowed_emails = st.secrets.get("allowed_emails", [])
+                if response.user.email not in allowed_emails:
+                    st.error("Access denied: You are not authorized to use this app.")
+                    return False
+                
+                # Log login
+                supabase.table("logins").insert({
+                    "email": response.user.email,
+                }).execute()
+
+                st.success("You have successfully logged in!")
+                st.session_state["user"] = response.user
+                return True
+    
+    return False
+
+auth_result = supabase()
+if auth_result:
+    run_main_app()
 
 # credentials = st.secrets["credentials"]
 

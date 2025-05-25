@@ -1,4 +1,6 @@
+openpyxl
+pandas
 streamlit
 streamlit-authenticator
-pandas
-openpyxl
+supabase
+
