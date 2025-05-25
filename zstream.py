@@ -2,6 +2,7 @@
 
 # 2025-05-23
 
+import datetime
 import streamlit as st
 import streamlit_authenticator as stauth
 import pandas as pd
@@ -64,13 +65,140 @@ def run_main_app():
     return None
 
 
+# def supabase():
+#     # Check if user is already logged in
+#     if "user" in st.session_state:
+#         st.success("Already logged in!")
+#         return True
+    
+#     # Replace with your actual Supabase project URL and anon key
+#     SUPABASE_URL = st.secrets["SUPABASE_URL"]
+#     SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+
+#     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+#     st.title("Secure Login")
+
+#     email = st.text_input("Enter your email address", key="email_input")
+
+#     if st.button("Send OTP"):
+#         if email:
+#             try:
+#                 response = supabase.auth.sign_in_with_otp({"email": email})
+#                 st.success("An OTP has been sent to your email.")
+#             except Exception as e:
+#                 st.error(f"Error sending OTP: {e}")
+
+
+#     otp = st.text_input("Enter the OTP code", key="otp_input")
+
+#     if st.button("Verify OTP"):
+#         if email and otp:
+#             try:
+#                 response = supabase.auth.verify_otp({
+#                     "email": email,
+#                     "token": otp,
+#                     "type": "email"
+#                 })
+
+#                 # Check if session exists in response
+#                 if not response.session:
+#                     st.error("OTP verification failed: no session returned.")
+#                     return False
+
+#                 session = response.session  # Get the authenticated session
+#                 user_email = session.user.email  # more reliable than response.user
+#                 allowed_emails = st.secrets.get("allowed_emails", [])
+                
+#                 if user_email not in allowed_emails:
+#                     st.error("You are not authorized to use this app.")
+#                     return False
+
+#                 # Set the session in supabase client so RLS policies recognize the user
+#                 if session:
+#                     supabase.auth.set_session(session)
+#                 else:
+#                     st.warning("No session found after OTP verification.")
+
+#                 # Now you can safely insert the login record
+#                 supabase.table("logins").insert({
+#                     "email": response.user.email,
+#                     "login_time": datetime.datetime.utcnow().isoformat()
+#                 }).execute()
+
+#                 # # Re-create the Supabase client with the session's token
+#                 # authed_supabase = create_client(
+#                 #     SUPABASE_URL,
+#                 #     SUPABASE_KEY,
+#                 #     options={
+#                 #         "global": {
+#                 #             "headers": {
+#                 #                 "Authorization": f"Bearer {session.access_token}"
+#                 #             }
+#                 #         }
+#                 #     }
+#                 # )
+
+#                 # # Now you're authenticated for the insert
+#                 # authed_supabase.table("logins").insert({
+#                 #     "email": user_email,
+#                 # }).execute()
+
+#                 # Now you're authenticated for the insert
+#                 # supabase.table("logins").insert({
+#                 #     "email": user_email,
+#                 # }).execute()
+                
+
+#                 st.success("You have successfully logged in!")
+#                 st.session_state["user"] = response.user
+
+#                 # # Optional: log login
+#                 # supabase.table("logins").insert({
+#                 #     "email": response.user.email,
+#                 # }).execute()
+
+#                 return True
+
+#             except Exception as e:
+#                 st.error(f"Error verifying OTP: {e}")
+
+#                 st.success("You have successfully logged in!")
+#                 st.session_state["user"] = session.user
+#                 return True
+
+#             # response = supabase.auth.verify_otp({
+#             #     "email": email,
+#             #     "token": otp,
+#             #     "type": "email"
+#             # })
+
+#             # if response.error:
+#             #     st.error(f"Error verifying OTP: {response.error.message}")
+#             # else:
+#             #     # Check if email is in allowed list
+#             #     allowed_emails = st.secrets.get("allowed_emails", [])
+#             #     if response.user.email not in allowed_emails:
+#             #         st.error("Access denied: You are not authorized to use this app.")
+#             #         return False
+                
+#             #     # Log login
+#             #     supabase.table("logins").insert({
+#             #         "email": response.user.email,
+#             #     }).execute()
+
+#             #     st.success("You have successfully logged in!")
+#             #     st.session_state["user"] = response.user
+#             #     return True
+    
+#     return False
+
 def supabase():
     # Check if user is already logged in
     if "user" in st.session_state:
         st.success("Already logged in!")
         return True
     
-    # Replace with your actual Supabase project URL and anon key
     SUPABASE_URL = st.secrets["SUPABASE_URL"]
     SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 
@@ -88,14 +216,6 @@ def supabase():
             except Exception as e:
                 st.error(f"Error sending OTP: {e}")
 
-            # response = supabase.auth.sign_in_with_otp({"email": email})
-            # if response.error:
-            #     st.error(f"Error sending OTP: {response.error.message}")
-            # else:
-            #     st.success("An OTP has been sent to your email.")
-
-
-
     otp = st.text_input("Enter the OTP code", key="otp_input")
 
     if st.button("Verify OTP"):
@@ -107,83 +227,35 @@ def supabase():
                     "type": "email"
                 })
 
-                # Check if session exists in response
+                # Check session presence
                 if not response.session:
                     st.error("OTP verification failed: no session returned.")
                     return False
 
-                session = response.session  # Get the authenticated session
-                user_email = session.user.email  # more reliable than response.user
+                session = response.session
+                user_email = session.user.email
+
                 allowed_emails = st.secrets.get("allowed_emails", [])
-                
                 if user_email not in allowed_emails:
                     st.error("You are not authorized to use this app.")
                     return False
 
-                # # Re-create the Supabase client with the session's token
-                # authed_supabase = create_client(
-                #     SUPABASE_URL,
-                #     SUPABASE_KEY,
-                #     options={
-                #         "global": {
-                #             "headers": {
-                #                 "Authorization": f"Bearer {session.access_token}"
-                #             }
-                #         }
-                #     }
-                # )
+                # Set the session so Supabase SDK knows who is logged in
+                supabase.auth.set_session(session)
 
-                # # Now you're authenticated for the insert
-                # authed_supabase.table("logins").insert({
-                #     "email": user_email,
-                # }).execute()
-
-                # Now you're authenticated for the insert
+                # Insert login record (RLS should allow this now)
                 supabase.table("logins").insert({
                     "email": user_email,
+                    "login_time": datetime.datetime.utcnow().isoformat()
                 }).execute()
-                
-
-                st.success("You have successfully logged in!")
-                st.session_state["user"] = response.user
-
-                # # Optional: log login
-                # supabase.table("logins").insert({
-                #     "email": response.user.email,
-                # }).execute()
-
-                return True
-
-            except Exception as e:
-                st.error(f"Error verifying OTP: {e}")
 
                 st.success("You have successfully logged in!")
                 st.session_state["user"] = session.user
                 return True
 
-            # response = supabase.auth.verify_otp({
-            #     "email": email,
-            #     "token": otp,
-            #     "type": "email"
-            # })
-
-            # if response.error:
-            #     st.error(f"Error verifying OTP: {response.error.message}")
-            # else:
-            #     # Check if email is in allowed list
-            #     allowed_emails = st.secrets.get("allowed_emails", [])
-            #     if response.user.email not in allowed_emails:
-            #         st.error("Access denied: You are not authorized to use this app.")
-            #         return False
-                
-            #     # Log login
-            #     supabase.table("logins").insert({
-            #         "email": response.user.email,
-            #     }).execute()
-
-            #     st.success("You have successfully logged in!")
-            #     st.session_state["user"] = response.user
-            #     return True
+            except Exception as e:
+                st.error(f"Error verifying OTP: {e}")
+                return False
     
     return False
 
