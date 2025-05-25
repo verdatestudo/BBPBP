@@ -133,11 +133,15 @@ def supabase():
                 #     }
                 # )
 
+                # # Now you're authenticated for the insert
+                # authed_supabase.table("logins").insert({
+                #     "email": user_email,
+                # }).execute()
+
                 # Now you're authenticated for the insert
-                authed_supabase.table("logins").insert({
+                supabase.table("logins").insert({
                     "email": user_email,
                 }).execute()
-
                 
 
                 st.success("You have successfully logged in!")
