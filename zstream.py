@@ -45,15 +45,10 @@ def run_main_app():
 
         st.markdown(
             f"""
-            ### Copy/Download Google Sheet with pivot table templates here. Then paste the csv data into the first sheet.
+            Copy/Download Google Sheet with pivot table templates here. Then paste the csv data into the first sheet.
             [Open the Google Sheet here]({sheet_url})
             """
         )
-        
-        if st.button("Open Google Sheet"):
-            js = f"window.open('{sheet_url}')"  # New tab
-            st.components.v1.html(f"<script>{js}</script>")
-
 
 
     st.header("How To")
