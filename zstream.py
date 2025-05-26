@@ -40,6 +40,22 @@ def run_main_app():
                     mime="text/csv"
                 )
 
+        # Google sheet with basic pivot tables.
+        sheet_url = "https://docs.google.com/spreadsheets/d/1SHWodJ1kw5OfaP9Ip5QjeKTXg1iipuZ6L9KTIbbXp5E/edit?usp=sharing"
+
+        st.markdown(
+            f"""
+            ### Copy/Download Google Sheet with pivot table templates here. Then paste the csv data into the first sheet.
+            [Open the Google Sheet here]({sheet_url})
+            """
+        )
+        
+        if st.button("Open Google Sheet"):
+            js = f"window.open('{sheet_url}')"  # New tab
+            st.components.v1.html(f"<script>{js}</script>")
+
+
+
     st.header("How To")
     st.markdown("* In BB Preferences, change language to English (UK).")
     st.markdown("* Download your play-by-play to a spreadsheet. SAVE AS CSV. See below if you require more detail.")
