@@ -28,6 +28,9 @@ def get_all_raw_data(df):
     return df_plays
     
 def convert_all_plays(df, player_name_pattern):
+    df = df[df['EVENT'].notna()].copy()
+    df.loc[:, 'EVENT'] = df['EVENT'].astype(str)
+
     df['PLAY_REGEX'] = df['EVENT'].apply(lambda row: convert_play_to_regex(row, player_name_pattern))
     return df
 
@@ -65,6 +68,7 @@ def generate_report(input_path, output_path_stage1, output_path_stage2):
 
 if __name__ == '__main__':
     fname = 'zstreamtest.csv'
+    fname = 'b3finals67.csv'
 
     # Section 1
     open_filename = f'game_data_1raw/{fname}'
